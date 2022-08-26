@@ -98,12 +98,12 @@ class SportsWalking(Training):
         k1: float = 0.035
         k2: float = 0.029
         min_in_hour: int = 60
-        return ((k1 * self.weight
-                 + (self.get_mean_speed()**2 // self.height)
-                 * k2
-                 * self.weight)
-                 * self.duration
-                 * min_in_hour)
+        # Для приятного вида глазу
+        var_1 = k1 * self.weight
+        var_2 = self.get_mean_speed()**2 // self.height
+        var_3 = k2 * self.weight
+        var_4 = self.duration * min_in_hour
+        return ((var_1 + var_2 * var_3) * var_4)
 
 
 class Swimming(Training):
