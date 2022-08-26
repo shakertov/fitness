@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Sequence, Union
 
+
 @dataclass
 class InfoMessage:
     """Информационное сообщение о тренировке."""
@@ -69,6 +70,7 @@ class Training:
                            distance,
                            speed,
                            calories)
+
     def hours_to_minutes(self) -> float:
         """Переводит часы в минуты."""
         return self.min_in_hour * self.duration
@@ -92,6 +94,8 @@ class Running(Training):
 class SportsWalking(Training):
     """Тренировка: спортивная ходьба."""
     LEN_STEP: float = 0.65
+    k1: float = 0.035
+    k2: float = 0.029
 
     def __init__(self,
                  action: int,
@@ -104,12 +108,9 @@ class SportsWalking(Training):
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        k1: float = 0.035
-        k2: float = 0.029
-        min_in_hour: int = 60
-        var_1 = k1 * self.weight
+        var_1 = self.k1 * self.weight
         var_2 = self.get_mean_speed()**2 // self.height
-        var_3 = k2 * self.weight
+        var_3 = self.k2 * self.weight
         var_4 = self.hours_to_minutes()
         return ((var_1 + var_2 * var_3) * var_4)
 
@@ -117,6 +118,8 @@ class SportsWalking(Training):
 class Swimming(Training):
     """Тренировка: плавание."""
     LEN_STEP: float = 1.38
+    k1: float = 1.1
+    k2: int = 2
 
     def __init__(self,
                  action: int,
@@ -138,12 +141,11 @@ class Swimming(Training):
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        k1: float = 1.1
-        k2: int = 2
-        return (self.get_mean_speed() + k1) * k2 * self.weight
+        return (self.get_mean_speed() + self.k1) * self.k2 * self.weight
 
 
-def read_package(workout_type: str, data: Sequence[Union[str, float, int]]) -> Training:
+def read_package(workout_type: str,
+                 data: Sequence[Union[str, float, int]]) -> Training:
     """Прочитать данные полученные от датчиков."""
     dict = {
         'SWM': Swimming,
