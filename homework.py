@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Sequence, Union
+from typing import Sequence, Union, Dict
 
 
 @dataclass
@@ -25,7 +25,7 @@ class Training:
 
     LEN_STEP: float = 0.65  # рас-ние за один шаг или гребок
     M_IN_KM: float = 1000  # из метров в км
-    min_in_hour: float = 60
+    MIN_IN_HOUR: float = 60
 
     def __init__(self,
                  action: int,
@@ -35,8 +35,8 @@ class Training:
         """Конструктор класса Training
         Атрибуты класса, которые инициализируются:
         action - кол-во совершеннных действий
-        duration - время тренировки
-        weight - вес спортсмена.
+        duration - время тренировки [часы]
+        weight - вес спортсмена [кг].
         """
         self.action = action
         self.duration = duration
@@ -52,10 +52,7 @@ class Training:
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        try:
-            pass
-        except NotImplementedError:
-            pass
+        raise NotImplementedError:
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
@@ -73,19 +70,19 @@ class Training:
 
     def hours_to_minutes(self) -> float:
         """Переводит часы в минуты."""
-        return self.min_in_hour * self.duration
+        return self.MIN_IN_HOUR * self.duration
 
 
 class Running(Training):
     """Тренировка: бег."""
     LEN_STEP: float = 0.65
-    k1: float = 18
-    k2: float = 20
+    K1: float = 18
+    K2: float = 20
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        return ((self.k1 * self.get_mean_speed()
-                - self.k2)
+        return ((self.K1 * self.get_mean_speed()
+                - self.K2)
                 * self.weight
                 / Running.M_IN_KM
                 * self.hours_to_minutes())
@@ -94,8 +91,8 @@ class Running(Training):
 class SportsWalking(Training):
     """Тренировка: спортивная ходьба."""
     LEN_STEP: float = 0.65
-    k1: float = 0.035
-    k2: float = 0.029
+    K1: float = 0.035
+    K2: float = 0.029
 
     def __init__(self,
                  action: int,
@@ -103,14 +100,18 @@ class SportsWalking(Training):
                  weight: float,
                  height: float
                  ) -> None:
+        """Конструктор класса SportsWalking
+        Атрибуты класса:
+        height - рост [см]
+        """
         super().__init__(action, duration, weight)
         self.height = height
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        var_1 = self.k1 * self.weight
+        var_1 = self.K1 * self.weight
         var_2 = self.get_mean_speed()**2 // self.height
-        var_3 = self.k2 * self.weight
+        var_3 = self.K2 * self.weight
         var_4 = self.hours_to_minutes()
         return ((var_1 + var_2 * var_3) * var_4)
 
@@ -118,8 +119,8 @@ class SportsWalking(Training):
 class Swimming(Training):
     """Тренировка: плавание."""
     LEN_STEP: float = 1.38
-    k1: float = 1.1
-    k2: int = 2
+    K1: float = 1.1
+    K2: int = 2
 
     def __init__(self,
                  action: int,
@@ -128,6 +129,11 @@ class Swimming(Training):
                  length_pool: float,
                  count_pool: float
                  ) -> None:
+        """Конструктор класса Swimming
+        Атрибуты класса:
+        length_pool - длина бассейна [метры]
+        count_pool - сколько раз переплыл бассейн
+        """
         super().__init__(action, duration, weight)
         self.length_pool = length_pool
         self.count_pool = count_pool
@@ -141,13 +147,13 @@ class Swimming(Training):
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        return (self.get_mean_speed() + self.k1) * self.k2 * self.weight
+        return (self.get_mean_speed() + self.K1) * self.K2 * self.weight
 
 
 def read_package(workout_type: str,
-                 data: Sequence[Union[str, float, int]]) -> Training:
+                 data: Sequence[Union[float, int]]) -> Training:
     """Прочитать данные полученные от датчиков."""
-    dict = {
+    dict: Dict[str, object] = {
         'SWM': Swimming,
         'RUN': Running,
         'WLK': SportsWalking
