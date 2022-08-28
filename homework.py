@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Sequence, Union, Dict
+from typing import Sequence, Union, Dict, Type
 
 
 @dataclass
@@ -102,7 +102,10 @@ class SportsWalking(Training):
                  ) -> None:
         """Конструктор класса SportsWalking
         Атрибуты класса:
-        height - рост [см]
+        action - кол-во совершеннных действий
+        duration - время тренировки [часы]
+        weight - вес спортсмена [кг]
+        height - рост [см].
         """
         super().__init__(action, duration, weight)
         self.height = height
@@ -131,8 +134,11 @@ class Swimming(Training):
                  ) -> None:
         """Конструктор класса Swimming
         Атрибуты класса:
+        action - кол-во совершеннных действий
+        duration - время тренировки [часы]
+        weight - вес спортсмена [кг]
         length_pool - длина бассейна [метры]
-        count_pool - сколько раз переплыл бассейн
+        count_pool - сколько раз переплыл бассейн.
         """
         super().__init__(action, duration, weight)
         self.length_pool = length_pool
@@ -153,7 +159,7 @@ class Swimming(Training):
 def read_package(workout_type: str,
                  data: Sequence[Union[float, int]]) -> Training:
     """Прочитать данные полученные от датчиков."""
-    dict: Dict[str, object] = {
+    dict: Dict[str, Type[Training]] = {
         'SWM': Swimming,
         'RUN': Running,
         'WLK': SportsWalking
